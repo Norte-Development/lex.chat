@@ -27,14 +27,14 @@ const visibilities: Array<{
 }> = [
   {
     id: 'private',
-    label: 'Private',
-    description: 'Only you can access this chat',
+    label: 'Privada',
+    description: 'Solo tú puedes acceder a esta consulta',
     icon: <LockIcon />,
   },
   {
     id: 'public',
-    label: 'Public',
-    description: 'Anyone with the link can access this chat',
+    label: 'Pública',
+    description: 'Cualquiera con el enlace puede acceder a esta consulta',
     icon: <GlobeIcon />,
   },
 ];
@@ -61,46 +61,39 @@ export function VisibilitySelector({
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger
-        asChild
-        className={cn(
-          'w-fit data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
-          className,
-        )}
-      >
+      <DropdownMenuTrigger asChild>
         <Button
-          data-testid="visibility-selector"
           variant="outline"
-          className="hidden md:flex md:px-2 md:h-[34px]"
+          className={`gap-2 px-3 h-fit hover:bg-primary/5 border-primary/20 transition-all duration-300 hover:shadow-md ${className}`}
         >
-          {selectedVisibility?.icon}
-          {selectedVisibility?.label}
-          <ChevronDownIcon />
+          <div className="w-4 h-4 text-primary">
+            {selectedVisibility?.icon}
+          </div>
+          <span className="text-sm font-medium">
+            {selectedVisibility?.label}
+          </span>
         </Button>
       </DropdownMenuTrigger>
-
-      <DropdownMenuContent align="start" className="min-w-[300px]">
+      <DropdownMenuContent 
+        align="start" 
+        className="w-64 bg-gradient-to-br from-card to-muted/20 border border-border/50 shadow-xl backdrop-blur-sm"
+      >
         {visibilities.map((visibility) => (
           <DropdownMenuItem
-            data-testid={`visibility-selector-item-${visibility.id}`}
             key={visibility.id}
-            onSelect={() => {
-              setVisibilityType(visibility.id);
-              setOpen(false);
-            }}
-            className="gap-4 group/item flex flex-row justify-between items-center"
-            data-active={visibility.id === visibilityType}
+            onSelect={() => setVisibilityType(visibility.id)}
+            className="flex items-start gap-3 p-4 hover:bg-primary/5 transition-colors duration-300 cursor-pointer"
           >
-            <div className="flex flex-col gap-1 items-start">
-              {visibility.label}
-              {visibility.description && (
-                <div className="text-xs text-muted-foreground">
-                  {visibility.description}
-                </div>
-              )}
+            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-4 text-primary">
+                {visibility.icon}
+              </div>
             </div>
-            <div className="text-foreground dark:text-foreground opacity-0 group-data-[active=true]/item:opacity-100">
-              <CheckCircleFillIcon />
+            <div className="flex flex-col gap-1">
+              <div className="font-semibold text-sm">{visibility.label}</div>
+              <div className="text-xs text-muted-foreground leading-relaxed">
+                {visibility.description}
+              </div>
             </div>
           </DropdownMenuItem>
         ))}

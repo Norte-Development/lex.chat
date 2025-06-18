@@ -109,29 +109,6 @@ function PureMultimodalInput({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
-  const submitForm = useCallback(() => {
-    window.history.replaceState({}, '', `/chat/${chatId}`);
-
-    handleSubmit(undefined, {
-      experimental_attachments: attachments,
-    });
-
-    setAttachments([]);
-    setLocalStorageInput('');
-    resetHeight();
-
-    if (width && width > 768) {
-      textareaRef.current?.focus();
-    }
-  }, [
-    attachments,
-    handleSubmit,
-    setAttachments,
-    setLocalStorageInput,
-    width,
-    chatId,
-  ]);
-
   const uploadFile = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -151,11 +128,12 @@ function PureMultimodalInput({
           name: pathname,
           contentType: contentType,
         };
+      } else {
+        const { error } = await response.json();
+        toast.error(error);
       }
-      const { error } = await response.json();
-      toast.error(error);
     } catch (error) {
-      toast.error('Failed to upload file, please try again!');
+      toast.error('Error al cargar archivo. Intenta de nuevo.');
     }
   };
 
@@ -184,6 +162,29 @@ function PureMultimodalInput({
     },
     [setAttachments],
   );
+
+  const submitForm = useCallback(() => {
+    window.history.replaceState({}, '', `/chat/${chatId}`);
+
+    handleSubmit(undefined, {
+      experimental_attachments: attachments,
+    });
+
+    setAttachments([]);
+    setLocalStorageInput('');
+    resetHeight();
+
+    if (width && width > 768) {
+      textareaRef.current?.focus();
+    }
+  }, [
+    attachments,
+    handleSubmit,
+    setAttachments,
+    setLocalStorageInput,
+    width,
+    chatId,
+  ]);
 
   const { isAtBottom, scrollToBottom } = useScrollToBottom();
 
@@ -265,7 +266,7 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Escribe tu consulta jurídica..."
         value={input}
         onChange={handleInput}
         className={cx(
@@ -283,7 +284,7 @@ function PureMultimodalInput({
             event.preventDefault();
 
             if (status !== 'ready') {
-              toast.error('Please wait for the model to finish its response!');
+              toast.error('Espera a que termine la respuesta actual.');
             } else {
               submitForm();
             }

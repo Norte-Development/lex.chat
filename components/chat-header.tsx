@@ -12,6 +12,7 @@ import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
+import { Scale } from 'lucide-react';
 
 function PureChatHeader({
   chatId,
@@ -30,25 +31,38 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-background py-1.5 items-center px-2 md:px-2 gap-2">
+    <header className="flex sticky top-0 bg-gradient-to-r from-background via-background to-muted/20 backdrop-blur-sm border-b border-border/50 py-3 items-center px-4 md:px-6 gap-3 shadow-sm">
       <SidebarToggle />
+
+      {/* Logo and Brand */}
+      <div className="flex items-center space-x-3">
+        <div className="w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+          <Scale className="w-4 h-4 text-white" />
+        </div>
+        <div className="hidden md:block">
+          <div className="font-bold text-lg bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+            lex-ai.chat
+          </div>
+          <div className="text-xs text-muted-foreground">IA Jurídica Argentina</div>
+        </div>
+      </div>
 
       {(!open || windowWidth < 768) && (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              className="order-2 md:order-1 md:px-2 px-2 md:h-fit ml-auto md:ml-0"
+              className="order-2 md:order-1 md:px-3 px-3 md:h-fit ml-auto md:ml-0 hover:bg-primary/5 border-primary/20 transition-all duration-300 hover:shadow-md"
               onClick={() => {
                 router.push('/');
                 router.refresh();
               }}
             >
               <PlusIcon />
-              <span className="md:sr-only">New Chat</span>
+              <span className="md:sr-only ml-2">Nueva Consulta</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent>New Chat</TooltipContent>
+          <TooltipContent>Nueva Consulta Jurídica</TooltipContent>
         </Tooltip>
       )}
 
@@ -61,15 +75,15 @@ function PureChatHeader({
       )}
 
       <Button
-        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"
+        className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white hidden md:flex py-2 px-4 h-fit md:h-[38px] order-4 md:ml-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
         asChild
       >
         <Link
-          href={`https://vercel.com/new/clone?repository-url=https://github.com/vercel/ai-chatbot&env=AUTH_SECRET&envDescription=Learn more about how to get the API Keys for the application&envLink=https://github.com/vercel/ai-chatbot/blob/main/.env.example&demo-title=AI Chatbot&demo-description=An Open-Source AI Chatbot Template Built With Next.js and the AI SDK by Vercel.&demo-url=https://chat.vercel.ai&products=[{"type":"integration","protocol":"ai","productSlug":"grok","integrationSlug":"xai"},{"type":"integration","protocol":"storage","productSlug":"neon","integrationSlug":"neon"},{"type":"integration","protocol":"storage","productSlug":"upstash-kv","integrationSlug":"upstash"},{"type":"blob"}]`}
-          target="_noblank"
+          href="/landing"
+          className="flex items-center space-x-2"
         >
-          <VercelIcon size={16} />
-          Deploy with Vercel
+          <Scale className="w-4 h-4" />
+          <span className="font-semibold">Acerca de lex-ai</span>
         </Link>
       </Button>
     </header>
