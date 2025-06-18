@@ -11,6 +11,9 @@ import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
+import { DocumentSearchCall, DocumentSearchResult } from './legal-document-search';
+import { GetFullNormativeCall, GetFullNormativeResult } from './legal-normative';
+import { GetSentenciaContentCall, GetSentenciaContentResult } from './legal-sentencia';
 import equal from 'fast-deep-equal';
 import { cn, sanitizeText } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -183,6 +186,21 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'documentSearch' ? (
+                        <DocumentSearchCall
+                          args={args}
+                          isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'getFullNormative' ? (
+                        <GetFullNormativeCall
+                          args={args}
+                          isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'getSentenciaContent' ? (
+                        <GetSentenciaContentCall
+                          args={args}
+                          isReadonly={isReadonly}
+                        />
                       ) : null}
                     </div>
                   );
@@ -209,6 +227,21 @@ const PurePreviewMessage = ({
                       ) : toolName === 'requestSuggestions' ? (
                         <DocumentToolResult
                           type="request-suggestions"
+                          result={result}
+                          isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'documentSearch' ? (
+                        <DocumentSearchResult
+                          result={result}
+                          isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'getFullNormative' ? (
+                        <GetFullNormativeResult
+                          result={result}
+                          isReadonly={isReadonly}
+                        />
+                      ) : toolName === 'getSentenciaContent' ? (
+                        <GetSentenciaContentResult
                           result={result}
                           isReadonly={isReadonly}
                         />
