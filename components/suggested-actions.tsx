@@ -19,24 +19,24 @@ function PureSuggestedActions({
 }: SuggestedActionsProps) {
   const suggestedActions = [
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: '¿Cuáles son los requisitos',
+      label: 'para un divorcio por mutuo acuerdo?',
+      action: '¿Cuáles son los requisitos para un divorcio por mutuo acuerdo según el Código Civil argentino?',
     },
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'Explícame los derechos',
+      label: 'del trabajador en caso de despido',
+      action: 'Explícame los derechos del trabajador en caso de despido según la Ley de Contrato de Trabajo',
     },
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Redacta un contrato',
+      label: 'de locación de inmueble',
+      action: 'Redacta un contrato de locación de inmueble conforme a la legislación argentina vigente',
     },
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: '¿Qué establece el artículo',
+      label: '1109 del Código Civil?',
+      action: '¿Qué establece el artículo 1109 del Código Civil argentino sobre responsabilidad civil?',
     },
   ];
 
