@@ -98,6 +98,25 @@ test.describe('Chat activity', () => {
     expect(assistantMessage.content).toBe('This painting is by Monet!');
   });
 
+  test('Upload PDF attachment and analyze content', async () => {
+    await chatPage.addPdfAttachment();
+
+    await chatPage.isElementVisible('attachments-preview');
+    await chatPage.isElementVisible('input-attachment-loader');
+    await chatPage.isElementNotVisible('input-attachment-loader');
+
+    await chatPage.sendUserMessage('What does this PDF contain?');
+
+    const userMessage = await chatPage.getRecentUserMessage();
+    expect(userMessage.attachments).toHaveLength(1);
+
+    await chatPage.isGenerationComplete();
+
+    const assistantMessage = await chatPage.getRecentAssistantMessage();
+    // PDF should be processed and analyzed by the AI
+    expect(assistantMessage.content).toBeTruthy();
+  });
+
   test('Call weather tool', async () => {
     await chatPage.sendUserMessage("What's the weather in sf?");
     await chatPage.isGenerationComplete();

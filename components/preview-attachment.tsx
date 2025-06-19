@@ -24,8 +24,18 @@ export const PreviewAttachment = ({
               alt={name ?? 'An image attachment'}
               className="rounded-md size-full object-cover"
             />
+          ) : contentType === 'application/pdf' ? (
+            <iframe
+              key={url}
+              src={url}
+              title={name ?? 'A PDF attachment'}
+              className="rounded-md size-full"
+              style={{ pointerEvents: 'none' }}
+            />
           ) : (
-            <div className="" />
+            <div className="text-xs text-muted-foreground text-center p-1">
+              {name?.split('.').pop()?.toUpperCase() || 'FILE'}
+            </div>
           )
         ) : (
           <div className="" />

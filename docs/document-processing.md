@@ -1,6 +1,60 @@
 # Document Processing
 
-This document describes the document processing features and troubleshooting for the lex.chat application.
+This document explains how document processing works in the application, including file uploads, AI analysis, and various document formats.
+
+## Overview
+
+The application supports processing various types of documents and files:
+- PDF documents (via attachment upload)
+- Images (JPEG, PNG) 
+- Legal documents through the document search functionality
+- Text-based content creation and editing
+
+## PDF Attachment Support
+
+### File Upload Support
+Users can now attach PDF files to their chat messages for AI analysis. The system supports:
+
+- **File Types**: PDF documents (`application/pdf`)
+- **File Size Limit**: Up to 10MB per file
+- **Multiple Files**: Users can attach multiple PDFs and images in a single message
+- **AI Processing**: Gemini 2.5 can analyze PDF content and answer questions about the documents
+
+### How to Use PDF Attachments
+
+1. **Uploading PDFs**:
+   - Click the paperclip (📎) icon in the chat input
+   - Select one or more PDF files from your device
+   - Files will be uploaded and displayed as previews
+   - Type your question about the PDF content
+   - Send the message for AI analysis
+
+2. **PDF Display**:
+   - **Input Preview**: Small thumbnail preview while composing your message
+   - **Message Display**: Full-size iframe viewer (400px height) for easy reading
+   - **File Information**: Shows PDF icon (📄) and filename
+
+3. **AI Interaction**:
+   - Ask questions about PDF content
+   - Request summaries or analysis
+   - Compare information across multiple PDFs
+   - Extract specific information from documents
+
+### Technical Implementation
+
+- **Upload Validation**: Server-side validation ensures only PDF, JPEG, and PNG files are accepted
+- **Security**: Files are uploaded to Vercel Blob storage with public access for AI processing
+- **Responsive Design**: PDF viewers adapt to different screen sizes
+- **Error Handling**: User-friendly error messages for upload failures or invalid files
+
+### Example Use Cases
+
+- **Legal Research**: Upload court decisions or legal documents for analysis
+- **Contract Review**: Attach contracts for AI-powered review and questions
+- **Document Comparison**: Upload multiple PDFs to compare content
+- **Content Extraction**: Ask AI to extract specific clauses or information from PDFs
+
+## Document Creation & Management
 
 ## Data Streaming Architecture
 
