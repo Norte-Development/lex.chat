@@ -57,6 +57,13 @@
       "when": 1750335978027,
       "tag": "0007_hesitant_malice",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1750342190506,
+      "tag": "0008_calm_true_believers",
+      "breakpoints": true
     }
   ]
 }

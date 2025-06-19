@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import Link from "next/link"
+import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,9 +25,57 @@ import {
   Zap,
   Star,
   X,
+  Loader2,
 } from "lucide-react"
 
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 export default function PricingPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubscribe = async () => {
+    try {
+      setIsLoading(true);
+      
+      const response = await fetch('/api/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { sessionId } = await response.json();
+
+      if (!sessionId) {
+        throw new Error('No session ID returned');
+      }
+
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe failed to load');
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
+      if (error) {
+        console.error('Stripe checkout error:', error);
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      // You could show a toast notification here
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
@@ -180,16 +232,25 @@ export default function PricingPage() {
                 <Separator />
 
                 <div className="space-y-4">
-                  <Link href="/register">
-                    <Button
-                      size="lg"
-                      className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <Sparkles className="mr-2 w-5 h-5" />
-                      Comenzar Ahora
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={handleSubscribe}
+                    disabled={isLoading}
+                    size="lg"
+                    className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 w-5 h-5" />
+                        Comenzar Ahora
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
                   <div className="text-center space-y-2">
                     <p className="text-xs text-muted-foreground">
                       ✓ 7 días gratis • ✓ Cancela cuando quieras
@@ -338,17 +399,26 @@ export default function PricingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Link href="/register">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300"
-              >
-                <Sparkles className="mr-2 w-5 h-5" />
-                Comenzar Prueba Gratuita
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Link>
+            <Button
+              onClick={handleSubscribe}
+              disabled={isLoading}
+              size="lg"
+              variant="secondary"
+              className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 w-5 h-5" />
+                  Comenzar Prueba Gratuita
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </>
+              )}
+            </Button>
             <Link href="/contact">
               <Button
                 size="lg"

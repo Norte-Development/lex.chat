@@ -31,6 +31,8 @@ import {
   passwordResetToken,
   type EmailVerificationToken,
   type PasswordResetToken,
+  subscription,
+  payment,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 import { generateUUID } from '../utils';
@@ -359,26 +361,9 @@ export async function deleteDocumentsByIdAfterTimestamp({
   id: string;
   timestamp: Date;
 }) {
-  try {
-    await db
-      .delete(suggestion)
-      .where(
-        and(
-          eq(suggestion.documentId, id),
-          gt(suggestion.documentCreatedAt, timestamp),
-        ),
-      );
-
-    return await db
-      .delete(document)
-      .where(and(eq(document.id, id), gt(document.createdAt, timestamp)))
-      .returning();
-  } catch (error) {
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to delete documents by id after timestamp',
-    );
-  }
+  await db
+    .delete(document)
+    .where(and(eq(document.id, id), gt(document.createdAt, timestamp)));
 }
 
 export async function saveSuggestions({
@@ -682,4 +667,124 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       'Failed to get user by email',
     );
   }
+}
+
+// Subscription queries
+export async function createSubscription({
+  userId,
+  stripeCustomerId,
+  stripeSubscriptionId,
+  stripePriceId,
+  status,
+  currentPeriodStart,
+  currentPeriodEnd,
+}: {
+  userId: string;
+  stripeCustomerId: string;
+  stripeSubscriptionId: string;
+  stripePriceId: string;
+  status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid';
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
+}) {
+  return await db
+    .insert(subscription)
+    .values({
+      userId,
+      stripeCustomerId,
+      stripeSubscriptionId,
+      stripePriceId,
+      status,
+      currentPeriodStart,
+      currentPeriodEnd,
+    })
+    .returning();
+}
+
+export async function getSubscriptionByUserId(userId: string) {
+  return await db
+    .select()
+    .from(subscription)
+    .where(eq(subscription.userId, userId))
+    .orderBy(desc(subscription.createdAt))
+    .limit(1);
+}
+
+export async function getSubscriptionByStripeId(stripeSubscriptionId: string) {
+  return await db
+    .select()
+    .from(subscription)
+    .where(eq(subscription.stripeSubscriptionId, stripeSubscriptionId))
+    .limit(1);
+}
+
+export async function updateSubscription({
+  stripeSubscriptionId,
+  status,
+  currentPeriodStart,
+  currentPeriodEnd,
+}: {
+  stripeSubscriptionId: string;
+  status: 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'trialing' | 'unpaid';
+  currentPeriodStart?: Date;
+  currentPeriodEnd?: Date;
+}) {
+  const updateData: any = {
+    status,
+    updatedAt: new Date(),
+  };
+
+  if (currentPeriodStart) updateData.currentPeriodStart = currentPeriodStart;
+  if (currentPeriodEnd) updateData.currentPeriodEnd = currentPeriodEnd;
+
+  return await db
+    .update(subscription)
+    .set(updateData)
+    .where(eq(subscription.stripeSubscriptionId, stripeSubscriptionId))
+    .returning();
+}
+
+export async function createPayment({
+  userId,
+  subscriptionId,
+  stripePaymentIntentId,
+  amount,
+  currency,
+  status,
+}: {
+  userId: string;
+  subscriptionId?: string;
+  stripePaymentIntentId: string;
+  amount: string;
+  currency: string;
+  status: 'succeeded' | 'pending' | 'failed' | 'canceled';
+}) {
+  return await db
+    .insert(payment)
+    .values({
+      userId,
+      subscriptionId,
+      stripePaymentIntentId,
+      amount,
+      currency,
+      status,
+    })
+    .returning();
+}
+
+export async function hasActiveSubscription(userId: string): Promise<boolean> {
+  const subscriptions = await getSubscriptionByUserId(userId);
+  
+  if (subscriptions.length === 0) {
+    return false;
+  }
+
+  const sub = subscriptions[0];
+  const now = new Date();
+  
+  // Check if subscription is active and not expired
+  return (
+    (sub.status === 'active' || sub.status === 'trialing') &&
+    sub.currentPeriodEnd > now
+  );
 }
