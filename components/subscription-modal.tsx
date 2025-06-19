@@ -16,6 +16,7 @@ import {
   Sparkles,
   ArrowRight,
   Scale,
+  ExternalLink,
   MessageSquare,
   Globe,
   FileText,
@@ -35,10 +36,12 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 interface SubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  hasActiveSubscription?: boolean;
 }
 
-export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
+export function SubscriptionModal({ isOpen, onClose, hasActiveSubscription = false }: SubscriptionModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
   const handleSubscribe = async () => {
     try {
@@ -74,6 +77,36 @@ export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
       console.error('Error creating checkout session:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      setIsLoadingPortal(true);
+      
+      const response = await fetch('/api/stripe/create-portal-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const { url } = await response.json();
+
+      if (!url) {
+        throw new Error('No portal URL returned');
+      }
+
+      // Open Stripe Customer Portal in new tab
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Error accessing billing portal:', error);
+    } finally {
+      setIsLoadingPortal(false);
     }
   };
 
@@ -155,33 +188,64 @@ export function SubscriptionModal({ isOpen, onClose }: SubscriptionModalProps) {
             </div>
 
             <div className="space-y-4">
-              <Button
-                onClick={handleSubscribe}
-                disabled={isLoading}
-                size="lg"
-                className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                    Procesando...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 w-5 h-5" />
-                    Comenzar Suscripción
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </>
-                )}
-              </Button>
+              {hasActiveSubscription ? (
+                <Button
+                  onClick={handleManageSubscription}
+                  disabled={isLoadingPortal}
+                  size="lg"
+                  variant="outline"
+                  className="w-full text-lg py-3"
+                >
+                  {isLoadingPortal ? (
+                    <>
+                      <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                      Cargando...
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="mr-2 w-5 h-5" />
+                      Gestionar Suscripción
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubscribe}
+                  disabled={isLoading}
+                  size="lg"
+                  className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 w-5 h-5" />
+                      Comenzar Suscripción
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+              )}
 
               <div className="text-center space-y-2">
-                <p className="text-xs text-muted-foreground">
-                  ✓ Cancelación inmediata • ✓ Sin compromisos a largo plazo
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  ✓ Facturación mensual • ✓ Soporte incluido
-                </p>
+                {hasActiveSubscription ? (
+                  <p className="text-xs text-muted-foreground">
+                    Serás redirigido al portal seguro de Stripe para gestionar tu suscripción,
+                    actualizar métodos de pago y ver tu historial de facturación.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground">
+                      ✓ Cancelación inmediata • ✓ Sin compromisos a largo plazo
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      ✓ Facturación mensual • ✓ Soporte incluido
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Chat } from '@/components/chat';
 import { generateUUID } from '@/lib/utils';
 import { DataStreamHandler } from '@/components/data-stream-handler';
@@ -8,12 +9,30 @@ import { SubscriptionModal } from '@/components/subscription-modal';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { guestRegex } from '@/lib/constants';
+import { CheckCircle } from 'lucide-react';
 
 export default function Page() {
   const { data: session, status } = useSession();
   const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Check for success parameter
+  useEffect(() => {
+    const success = searchParams.get('success');
+    if (success === 'true') {
+      setShowSuccessMessage(true);
+      // Clear the message after 5 seconds
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+      
+      // Clear the URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.delete('success');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams]);
 
   // Check authentication first
   useEffect(() => {
@@ -99,6 +118,25 @@ export default function Page() {
 
   return (
     <>
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-green-100 dark:bg-green-900/20 border-l-4 border-green-500 p-4 text-green-700 dark:text-green-300 rounded-md shadow-lg max-w-md">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <CheckCircle className="h-5 w-5" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium">
+                ¡Suscripción activada exitosamente!
+              </p>
+              <p className="text-xs mt-1">
+                Ahora tienes acceso completo a todas las funcionalidades.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <Chat
         key={id}
         id={id}

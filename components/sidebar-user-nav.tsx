@@ -1,10 +1,11 @@
 'use client';
 
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, CreditCard } from 'lucide-react';
 import Image from 'next/image';
 import type { User } from 'next-auth';
 import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
+import { useState } from 'react';
 
 import {
   DropdownMenu,
@@ -26,9 +27,44 @@ export function SidebarUserNav({ user }: { user: User }) {
   const router = useRouter();
   const { status } = useSession();
   const { setTheme, resolvedTheme } = useTheme();
+  const [isLoadingBilling, setIsLoadingBilling] = useState(false);
 
   // Since guests are blocked at middleware level, all users here are authenticated
   const isGuest = false;
+
+  const handleManageBilling = async () => {
+    try {
+      setIsLoadingBilling(true);
+      
+      const response = await fetch('/api/stripe/create-portal-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const { url } = await response.json();
+
+      if (!url) {
+        throw new Error('No portal URL returned');
+      }
+
+      // Open Stripe Customer Portal in new tab
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Error accessing billing portal:', error);
+      toast({
+        type: 'error',
+        description: 'No se pudo acceder al portal de facturación. Inténtalo de nuevo.',
+      });
+    } finally {
+      setIsLoadingBilling(false);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -77,6 +113,16 @@ export function SidebarUserNav({ user }: { user: User }) {
               onSelect={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             >
               {`Cambiar a modo ${resolvedTheme === 'light' ? 'oscuro' : 'claro'}`}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              data-testid="user-nav-item-billing"
+              className="cursor-pointer"
+              onSelect={handleManageBilling}
+              disabled={isLoadingBilling}
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              {isLoadingBilling ? 'Cargando...' : 'Gestionar Suscripción'}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild data-testid="user-nav-item-auth">

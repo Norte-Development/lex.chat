@@ -59,6 +59,18 @@ Two new tables were added to support subscriptions:
 #### Updated Pricing Page
 - Integrated with Stripe checkout
 - Buttons now create actual checkout sessions
+- Shows "Manage Subscription" button for existing subscribers
+
+#### Customer Portal
+- Dedicated API route (`/api/stripe/create-portal-session`) for portal access
+- Integrated into user navigation dropdown
+- Available in pricing page for subscription management
+- Allows users to:
+  - Update payment methods
+  - View billing history
+  - Cancel subscriptions
+  - Download invoices
+  - Update billing address
 
 ## Environment Variables
 

@@ -13,11 +13,22 @@ export async function middleware(request: NextRequest) {
     return new Response('pong', { status: 200 });
   }
 
-  // Allow all API routes except auth routes to pass through
+  // Allow specific API routes that don't require user authentication
+  const unauthenticatedApiRoutes = [
+    '/api/auth',           // NextAuth routes
+    '/api/stripe/webhook', // Stripe webhooks (authenticated via signature)
+  ];
+  
   if (pathname.startsWith('/api/')) {
-    if (pathname.startsWith('/api/auth')) {
+    // Check if this is an unauthenticated API route
+    const isUnauthenticatedRoute = unauthenticatedApiRoutes.some(route => 
+      pathname.startsWith(route)
+    );
+    
+    if (isUnauthenticatedRoute) {
       return NextResponse.next();
     }
+    
     // For other API routes, we still need to check authentication
     // but we'll handle this after the token check
   }
@@ -34,7 +45,7 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
-  // Handle API routes that require authentication
+  // Handle API routes that require authentication (excluding already handled unauthenticated routes)
   if (pathname.startsWith('/api/') && !token) {
     return new Response('Unauthorized', { status: 401 });
   }

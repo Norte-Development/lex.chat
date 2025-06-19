@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Link from "next/link"
 import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button"
@@ -26,6 +28,7 @@ import {
   Star,
   X,
   Loader2,
+  ExternalLink,
 } from "lucide-react"
 
 // Initialize Stripe
@@ -33,6 +36,40 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showCancelMessage, setShowCancelMessage] = useState(false);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    const canceled = searchParams.get('canceled');
+    if (canceled === 'true') {
+      setShowCancelMessage(true);
+      // Clear the message after 5 seconds
+      setTimeout(() => setShowCancelMessage(false), 5000);
+    }
+  }, [searchParams]);
+
+  // Check subscription status
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!session?.user?.id) return;
+
+      try {
+        const response = await fetch('/api/subscription/status');
+        const data = await response.json();
+        setHasActiveSubscription(data.hasActiveSubscription);
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+        setHasActiveSubscription(false);
+      }
+    };
+
+    if (session?.user?.id) {
+      checkSubscription();
+    }
+  }, [session?.user?.id]);
 
   const handleSubscribe = async () => {
     try {
@@ -76,8 +113,56 @@ export default function PricingPage() {
     }
   };
 
+  const handleManageSubscription = async () => {
+    try {
+      setIsLoadingPortal(true);
+      
+      const response = await fetch('/api/stripe/create-portal-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create portal session');
+      }
+
+      const { url } = await response.json();
+
+      if (!url) {
+        throw new Error('No portal URL returned');
+      }
+
+      // Open Stripe Customer Portal in new tab
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Error accessing billing portal:', error);
+    } finally {
+      setIsLoadingPortal(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Cancel Message */}
+      {showCancelMessage && (
+        <div className="bg-orange-100 dark:bg-orange-900/20 border-l-4 border-orange-500 p-4 text-orange-700 dark:text-orange-300">
+          <div className="container mx-auto">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <X className="h-5 w-5" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm">
+                  El proceso de suscripción fue cancelado. No se realizó ningún cargo a tu tarjeta.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/50 backdrop-blur-sm bg-background/95">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -232,25 +317,47 @@ export default function PricingPage() {
                 <Separator />
 
                 <div className="space-y-4">
-                  <Button
-                    onClick={handleSubscribe}
-                    disabled={isLoading}
-                    size="lg"
-                    className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                        Procesando...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2 w-5 h-5" />
-                        Comenzar Ahora
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
+                  {hasActiveSubscription ? (
+                    <Button
+                      onClick={handleManageSubscription}
+                      disabled={isLoadingPortal}
+                      size="lg"
+                      variant="outline"
+                      className="w-full text-lg py-3"
+                    >
+                      {isLoadingPortal ? (
+                        <>
+                          <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                          Cargando...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="mr-2 w-5 h-5" />
+                          Gestionar Suscripción
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubscribe}
+                      disabled={isLoading}
+                      size="lg"
+                      className="w-full text-lg py-3 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                          Procesando...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="mr-2 w-5 h-5" />
+                          Comenzar Ahora
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </>
+                      )}
+                    </Button>
+                  )}
                   <div className="text-center space-y-2">
                     <p className="text-xs text-muted-foreground">
                       ✓ 7 días gratis • ✓ Cancela cuando quieras
@@ -399,26 +506,48 @@ export default function PricingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button
-              onClick={handleSubscribe}
-              disabled={isLoading}
-              size="lg"
-              variant="secondary"
-              className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 w-5 h-5 animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 w-5 h-5" />
-                  Comenzar Prueba Gratuita
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </>
-              )}
-            </Button>
+            {hasActiveSubscription ? (
+              <Button
+                onClick={handleManageSubscription}
+                disabled={isLoadingPortal}
+                size="lg"
+                variant="secondary"
+                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300"
+              >
+                {isLoadingPortal ? (
+                  <>
+                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                    Cargando...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="mr-2 w-5 h-5" />
+                    Gestionar Suscripción
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubscribe}
+                disabled={isLoading}
+                size="lg"
+                variant="secondary"
+                className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl transition-all duration-300"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 w-5 h-5 animate-spin" />
+                    Procesando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 w-5 h-5" />
+                    Comenzar Prueba Gratuita
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            )}
             <Link href="/contact">
               <Button
                 size="lg"
