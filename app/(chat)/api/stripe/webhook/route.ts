@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { stripe, STRIPE_WEBHOOK_SECRET } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
+import { STRIPE_WEBHOOK_SECRET } from '@/lib/stripe-constants';
 import {
   createSubscription,
   updateSubscription,

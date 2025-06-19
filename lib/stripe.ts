@@ -1,3 +1,4 @@
+'use server';
 import Stripe from 'stripe';
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -9,13 +10,10 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   typescript: true,
 });
 
-export const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || 'price_1ABC123';
-export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
-
-export const formatAmountForDisplay = (
+export const formatAmountForDisplay = async (
   amount: number,
   currency: string
-): string => {
+): Promise<string> => {
   const numberFormat = new Intl.NumberFormat(['en-US'], {
     style: 'currency',
     currency: currency,
@@ -24,10 +22,10 @@ export const formatAmountForDisplay = (
   return numberFormat.format(amount / 100);
 };
 
-export const formatAmountForStripe = (
+export const formatAmountForStripe = async (
   amount: number,
   currency: string
-): number => {
+): Promise<number> => {
   const numberFormat = new Intl.NumberFormat(['en-US'], {
     style: 'currency',
     currency: currency,

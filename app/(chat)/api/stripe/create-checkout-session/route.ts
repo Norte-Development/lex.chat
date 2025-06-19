@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/app/(auth)/auth';
-import { stripe, STRIPE_PRICE_ID } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
+import { STRIPE_PRICE_ID } from '@/lib/stripe-constants';
 import { getUser } from '@/lib/db/queries';
 
 export async function POST(request: NextRequest) {
