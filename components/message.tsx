@@ -22,6 +22,56 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import type { Attachment } from 'ai';
+
+// Component for displaying attachments in messages with better PDF viewing
+const MessageAttachment = ({ attachment }: { attachment: Attachment }) => {
+  const { name, url, contentType } = attachment;
+
+  if (contentType?.startsWith('image/')) {
+    return (
+      <div className="max-w-sm">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={name ?? 'Image attachment'}
+          className="rounded-lg max-w-full h-auto border"
+        />
+        {name && (
+          <p className="text-xs text-muted-foreground mt-1 px-1">{name}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (contentType === 'application/pdf') {
+    return (
+      <div className="w-full max-w-2xl">
+        <iframe
+          src={url}
+          title={name ?? 'PDF attachment'}
+          className="w-full h-96 border rounded-lg"
+          style={{ minHeight: '400px' }}
+        />
+        {name && (
+          <p className="text-xs text-muted-foreground mt-1 px-1 flex items-center gap-1">
+            📄 {name}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // Fallback for other file types
+  return (
+    <div className="border rounded-lg p-4 bg-muted">
+      <p className="text-sm font-medium">{name}</p>
+      <p className="text-xs text-muted-foreground">
+        {contentType || 'Unknown file type'}
+      </p>
+    </div>
+  );
+};
 
 const PurePreviewMessage = ({
   chatId,
@@ -79,10 +129,10 @@ const PurePreviewMessage = ({
               message.experimental_attachments.length > 0 && (
                 <div
                   data-testid={`message-attachments`}
-                  className="flex flex-row justify-end gap-2"
+                  className="flex flex-col gap-4"
                 >
                   {message.experimental_attachments.map((attachment) => (
-                    <PreviewAttachment
+                    <MessageAttachment
                       key={attachment.url}
                       attachment={attachment}
                     />

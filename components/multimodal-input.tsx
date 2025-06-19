@@ -237,6 +237,7 @@ function PureMultimodalInput({
         ref={fileInputRef}
         multiple
         onChange={handleFileChange}
+        accept="image/*,application/pdf"
         tabIndex={-1}
       />
 
