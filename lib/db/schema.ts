@@ -15,9 +15,35 @@ export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
+  emailVerified: boolean('emailVerified').default(false).notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
 });
 
 export type User = InferSelectModel<typeof user>;
+
+export const emailVerificationToken = pgTable('EmailVerificationToken', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  token: varchar('token', { length: 255 }).notNull().unique(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});
+
+export type EmailVerificationToken = InferSelectModel<typeof emailVerificationToken>;
+
+export const passwordResetToken = pgTable('PasswordResetToken', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  token: varchar('token', { length: 255 }).notNull().unique(),
+  expiresAt: timestamp('expiresAt').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});
+
+export type PasswordResetToken = InferSelectModel<typeof passwordResetToken>;
 
 export const chat = pgTable('Chat', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),

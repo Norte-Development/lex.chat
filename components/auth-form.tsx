@@ -22,8 +22,8 @@ export function AuthForm({
         <div className="w-16 h-16 bg-gradient-to-br from-primary via-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl">
           <Scale className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-          lex-ai.chat
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Lex AI Chat
         </h1>
         <p className="text-sm text-muted-foreground mt-1">IA Jurídica Argentina</p>
       </div>
@@ -32,18 +32,19 @@ export function AuthForm({
         <div className="flex flex-col gap-3">
           <Label
             htmlFor="email"
-            className="text-foreground font-semibold text-sm"
+            className="text-sm font-medium text-foreground/80"
           >
-            Dirección de Email
+            Email
           </Label>
-
           <Input
             id="email"
             name="email"
-            className="bg-muted/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all duration-300 text-md md:text-sm h-12 rounded-xl shadow-sm"
+            className="bg-background/60 border-border/50 focus:border-primary/50 transition-all duration-200"
+            placeholder="nombre@ejemplo.com"
             type="email"
-            placeholder="usuario@bufete.com"
+            autoCapitalize="none"
             autoComplete="email"
+            autoCorrect="off"
             required
             autoFocus
             defaultValue={defaultEmail}
@@ -53,17 +54,17 @@ export function AuthForm({
         <div className="flex flex-col gap-3">
           <Label
             htmlFor="password"
-            className="text-foreground font-semibold text-sm"
+            className="text-sm font-medium text-foreground/80"
           >
             Contraseña
           </Label>
-
           <Input
             id="password"
             name="password"
-            className="bg-muted/50 border-border/50 hover:border-primary/50 focus:border-primary transition-all duration-300 text-md md:text-sm h-12 rounded-xl shadow-sm"
-            type="password"
+            className="bg-background/60 border-border/50 focus:border-primary/50 transition-all duration-200"
             placeholder="••••••••"
+            type="password"
+            autoComplete="current-password"
             required
           />
         </div>
@@ -74,7 +75,7 @@ export function AuthForm({
       {/* Professional footer */}
       <div className="text-center mt-6 text-xs text-muted-foreground">
         <p>Plataforma profesional para abogados argentinos</p>
-        <p className="mt-1">Base de datos actualizada diariamente</p>
+        <p className="mt-1">Cumplimiento normativo y confidencialidad garantizada</p>
       </div>
     </div>
   );
