@@ -27,7 +27,7 @@ export function DocumentSearchCall({ args, isReadonly }: DocumentSearchCallProps
       <div className="flex-1">
         <div className="font-medium">Buscando documentos legales</div>
         <div className="text-sm text-muted-foreground">
-          Consulta: "{query}"
+          Consulta: &ldquo;{query}&rdquo;
         </div>
         {filters && (
           <div className="text-xs text-muted-foreground mt-1">

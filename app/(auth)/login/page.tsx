@@ -30,19 +30,19 @@ export default function Page() {
     if (state.status === 'failed') {
       toast({
         type: 'error',
-        description: 'Invalid credentials!',
+        description: '¡Credenciales inválidas!',
       });
     } else if (state.status === 'invalid_data') {
       toast({
         type: 'error',
-        description: 'Failed validating your submission!',
+        description: '¡Error al validar tu envío!',
       });
     } else if (state.status === 'success') {
       setIsSuccessful(true);
       updateSession();
       router.refresh();
     }
-  }, [state.status]);
+  }, [state.status, updateSession, router]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get('email') as string);
@@ -53,22 +53,22 @@ export default function Page() {
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
-          <h3 className="text-xl font-semibold dark:text-zinc-50">Sign In</h3>
+          <h3 className="text-xl font-semibold dark:text-zinc-50">Iniciar Sesión</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Use your email and password to sign in
+            Usa tu email y contraseña para iniciar sesión
           </p>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
+          <SubmitButton isSuccessful={isSuccessful}>Iniciar sesión</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"Don't have an account? "}
+            {"¿No tienes una cuenta? "}
             <Link
               href="/register"
               className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
             >
-              Sign up
+              Regístrate
             </Link>
-            {' for free.'}
+            {' gratis.'}
           </p>
         </AuthForm>
       </div>

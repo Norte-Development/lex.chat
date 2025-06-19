@@ -28,7 +28,7 @@ export default function EnhancedLandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
-      <header className="relative border-b border-border/50 backdrop-blur-sm bg-background/95 sticky top-0 z-50">
+      <header className="sticky top-0 z-50 border-b border-border/50 backdrop-blur-sm bg-background/95">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -103,7 +103,7 @@ export default function EnhancedLandingPage() {
               </div>
               <br />
               <div className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary via-blue-600 via-purple-600 to-emerald-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary via-purple-600 to-emerald-600 bg-clip-text text-transparent">
                   Derecho Argentino
                 </span>
                 <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-blue-600 to-emerald-600 rounded-full animate-pulse"></div>
@@ -115,7 +115,7 @@ export default function EnhancedLandingPage() {
           <div className="max-w-4xl mx-auto mb-12">
             <p className="text-xl md:text-2xl text-muted-foreground mb-6 leading-relaxed font-light">
               La primera IA especializada en derecho argentino que consulta
-              <span className="text-foreground font-semibold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              <span className="font-semibold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 {" "}
                 con base de datos actualizada diariamente
               </span>
@@ -216,7 +216,7 @@ export default function EnhancedLandingPage() {
               Características Principales
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              ¿Por qué elegir lex-ai.chat?
+                                &ldquo;¿Por qué elegir lex-ai.chat?&rdquo;
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               La herramienta más avanzada para consultas jurídicas en Argentina, diseñada específicamente para
@@ -414,7 +414,7 @@ export default function EnhancedLandingPage() {
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
+                <p className="text-muted-foreground mb-4 italic">&ldquo;{testimonial.content}&rdquo;</p>
                 <div>
                   <div className="font-semibold">{testimonial.name}</div>
                   <div className="text-sm text-muted-foreground">{testimonial.role}</div>

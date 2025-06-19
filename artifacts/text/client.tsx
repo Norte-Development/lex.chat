@@ -20,7 +20,7 @@ interface TextArtifactMetadata {
 
 export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
   kind: 'text',
-  description: 'Useful for text content, like drafting essays and emails.',
+  description: 'Útil para contenido de texto, como redactar ensayos y emails.',
   initialize: async ({ documentId, setMetadata }) => {
     const suggestions = await getSuggestions({ documentId });
 
@@ -102,7 +102,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
   actions: [
     {
       icon: <ClockRewind size={18} />,
-      description: 'View changes',
+      description: 'Ver cambios',
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('toggle');
       },
@@ -116,7 +116,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     },
     {
       icon: <UndoIcon size={18} />,
-      description: 'View Previous version',
+      description: 'Ver versión anterior',
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('prev');
       },
@@ -130,7 +130,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     },
     {
       icon: <RedoIcon size={18} />,
-      description: 'View Next version',
+      description: 'Ver siguiente versión',
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('next');
       },
@@ -144,33 +144,33 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     },
     {
       icon: <CopyIcon size={18} />,
-      description: 'Copy to clipboard',
+      description: 'Copiar al portapapeles',
       onClick: ({ content }) => {
         navigator.clipboard.writeText(content);
-        toast.success('Copied to clipboard!');
+        toast.success('¡Copiado al portapapeles!');
       },
     },
   ],
   toolbar: [
     {
       icon: <PenIcon />,
-      description: 'Add final polish',
+      description: 'Añadir toque final',
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: 'user',
           content:
-            'Please add final polish and check for grammar, add section titles for better structure, and ensure everything reads smoothly.',
+            'Por favor añade un toque final y revisa la gramática, agrega títulos de sección para una mejor estructura, y asegúrate de que todo se lea de manera fluida.',
         });
       },
     },
     {
       icon: <MessageIcon />,
-      description: 'Request suggestions',
+      description: 'Solicitar sugerencias',
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: 'user',
           content:
-            'Please add suggestions you have that could improve the writing.',
+            'Por favor añade las sugerencias que tengas para mejorar la redacción.',
         });
       },
     },

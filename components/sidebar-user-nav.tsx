@@ -40,7 +40,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                 <div className="flex flex-row gap-2">
                   <div className="size-6 bg-zinc-500/30 rounded-full animate-pulse" />
                   <span className="bg-zinc-500/30 text-transparent rounded-md animate-pulse">
-                    Loading auth status
+                    Cargando estado de autenticación
                   </span>
                 </div>
                 <div className="animate-spin text-zinc-500">
@@ -60,7 +60,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   className="rounded-full"
                 />
                 <span data-testid="user-email" className="truncate">
-                  {isGuest ? 'Guest' : user?.email}
+                  {isGuest ? 'Invitado' : user?.email}
                 </span>
                 <ChevronUp className="ml-auto" />
               </SidebarMenuButton>
@@ -76,7 +76,7 @@ export function SidebarUserNav({ user }: { user: User }) {
               className="cursor-pointer"
               onSelect={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             >
-              {`Toggle ${resolvedTheme === 'light' ? 'dark' : 'light'} mode`}
+              {`Cambiar a modo ${resolvedTheme === 'light' ? 'oscuro' : 'claro'}`}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild data-testid="user-nav-item-auth">
@@ -88,7 +88,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                     toast({
                       type: 'error',
                       description:
-                        'Checking authentication status, please try again!',
+                        'Verificando estado de autenticación, ¡inténtalo de nuevo!',
                     });
 
                     return;
@@ -103,7 +103,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   }
                 }}
               >
-                {isGuest ? 'Login to your account' : 'Sign out'}
+                {isGuest ? 'Iniciar sesión en tu cuenta' : 'Cerrar sesión'}
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>

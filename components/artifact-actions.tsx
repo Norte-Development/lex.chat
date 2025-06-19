@@ -32,7 +32,7 @@ function PureArtifactActions({
   );
 
   if (!artifactDefinition) {
-    throw new Error('Artifact definition not found!');
+    throw new Error('¡Definición de artefacto no encontrada!');
   }
 
   const actionContext: ArtifactActionContext = {
@@ -62,7 +62,7 @@ function PureArtifactActions({
                 try {
                   await Promise.resolve(action.onClick(actionContext));
                 } catch (error) {
-                  toast.error('Failed to execute action');
+                  toast.error('Error al ejecutar la acción');
                 } finally {
                   setIsLoading(false);
                 }

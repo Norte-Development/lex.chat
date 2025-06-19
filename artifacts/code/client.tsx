@@ -114,8 +114,8 @@ export const codeArtifact = new Artifact<'code', Metadata>({
   actions: [
     {
       icon: <PlayIcon size={18} />,
-      label: 'Run',
-      description: 'Execute code',
+      label: 'Ejecutar',
+      description: 'Ejecutar código',
       onClick: async ({ content, setMetadata }) => {
         const runId = generateUUID();
         const outputContent: Array<ConsoleOutputContent> = [];
@@ -210,7 +210,7 @@ export const codeArtifact = new Artifact<'code', Metadata>({
     },
     {
       icon: <UndoIcon size={18} />,
-      description: 'View Previous version',
+      description: 'Ver versión anterior',
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('prev');
       },
@@ -224,7 +224,7 @@ export const codeArtifact = new Artifact<'code', Metadata>({
     },
     {
       icon: <RedoIcon size={18} />,
-      description: 'View Next version',
+      description: 'Ver siguiente versión',
       onClick: ({ handleVersionChange }) => {
         handleVersionChange('next');
       },
@@ -238,31 +238,31 @@ export const codeArtifact = new Artifact<'code', Metadata>({
     },
     {
       icon: <CopyIcon size={18} />,
-      description: 'Copy code to clipboard',
+      description: 'Copiar código al portapapeles',
       onClick: ({ content }) => {
         navigator.clipboard.writeText(content);
-        toast.success('Copied to clipboard!');
+                  toast.success('¡Copiado al portapapeles!');
       },
     },
   ],
   toolbar: [
     {
       icon: <MessageIcon />,
-      description: 'Add comments',
+      description: 'Añadir comentarios',
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: 'user',
-          content: 'Add comments to the code snippet for understanding',
+                      content: 'Añade comentarios al fragmento de código para su comprensión',
         });
       },
     },
     {
       icon: <LogsIcon />,
-      description: 'Add logs',
+      description: 'Añadir logs',
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: 'user',
-          content: 'Add logs to the code snippet for debugging',
+                      content: 'Añade logs al fragmento de código para depuración',
         });
       },
     },

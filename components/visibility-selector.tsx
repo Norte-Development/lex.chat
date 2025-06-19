@@ -19,25 +19,25 @@ import { useChatVisibility } from '@/hooks/use-chat-visibility';
 
 export type VisibilityType = 'private' | 'public';
 
-const visibilities: Array<{
-  id: VisibilityType;
-  label: string;
-  description: string;
-  icon: ReactNode;
-}> = [
-  {
-    id: 'private',
-    label: 'Privada',
-    description: 'Solo tú puedes acceder a esta consulta',
-    icon: <LockIcon />,
-  },
-  {
-    id: 'public',
-    label: 'Pública',
-    description: 'Cualquiera con el enlace puede acceder a esta consulta',
-    icon: <GlobeIcon />,
-  },
-];
+// const visibilities: Array<{
+//   id: VisibilityType;
+//   label: string;
+//   description: string;
+//   icon: ReactNode;
+// }> = [
+//   {
+//     id: 'private',
+//     label: 'Privada',
+//     description: 'Solo tú puedes acceder a esta consulta',
+//     icon: <LockIcon />,
+//   },
+//   {
+//     id: 'public',
+//     label: 'Pública',
+//     description: 'Cualquiera con el enlace puede acceder a esta consulta',
+//     icon: <GlobeIcon />,
+//   },
+// ];
 
 export function VisibilitySelector({
   chatId,
@@ -54,10 +54,10 @@ export function VisibilitySelector({
     initialVisibilityType: selectedVisibilityType,
   });
 
-  const selectedVisibility = useMemo(
-    () => visibilities.find((visibility) => visibility.id === visibilityType),
-    [visibilityType],
-  );
+  // const selectedVisibility = useMemo(
+  //   () => visibilities.find((visibility) => visibility.id === visibilityType),
+  //   [visibilityType],
+  // );
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -66,19 +66,19 @@ export function VisibilitySelector({
           variant="outline"
           className={`gap-2 px-3 h-fit hover:bg-primary/5 border-primary/20 transition-all duration-300 hover:shadow-md ${className}`}
         >
-          <div className="w-4 h-4 text-primary">
+          {/* <div className="w-4 h-4 text-primary">
             {selectedVisibility?.icon}
           </div>
           <span className="text-sm font-medium">
             {selectedVisibility?.label}
-          </span>
+          </span> */}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
         className="w-64 bg-gradient-to-br from-card to-muted/20 border border-border/50 shadow-xl backdrop-blur-sm"
       >
-        {visibilities.map((visibility) => (
+        {/* {visibilities.map((visibility) => (
           <DropdownMenuItem
             key={visibility.id}
             onSelect={() => setVisibilityType(visibility.id)}
@@ -96,7 +96,7 @@ export function VisibilitySelector({
               </div>
             </div>
           </DropdownMenuItem>
-        ))}
+        ))} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

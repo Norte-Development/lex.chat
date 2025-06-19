@@ -1,11 +1,15 @@
 'use client';
 
-import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
-import { useParams, useRouter } from 'next/navigation';
+import { isToday, isYesterday, subMonths, subWeeks, formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import type { User } from 'next-auth';
-import { useState } from 'react';
+import { useState, memo, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import useSWRInfinite from 'swr/infinite';
+import { useSWRConfig } from 'swr';
+import Link from 'next/link';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,16 +28,11 @@ import {
 } from '@/components/ui/sidebar';
 import type { Chat } from '@/lib/db/schema';
 import { fetcher } from '@/lib/utils';
-import { ChatItem } from './sidebar-history-item';
-import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from './icons';
-import Link from 'next/link';
-import { memo, useCallback, useEffect, useMemo } from 'react';
-import { useSWRConfig } from 'swr';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { SidebarHistoryItem } from './sidebar-history-item';
-import { usePathname } from 'next/navigation';
+
+// Note: Using SidebarHistoryItem but keeping ChatItem alias for backwards compatibility
+const ChatItem = SidebarHistoryItem;
 
 type GroupedChats = {
   today: Chat[];
@@ -132,7 +131,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     });
 
     toast.promise(deletePromise, {
-      loading: 'Deleting chat...',
+      loading: 'Eliminando conversación...',
       success: () => {
         mutate((chatHistories) => {
           if (chatHistories) {
@@ -143,9 +142,9 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
           }
         });
 
-        return 'Chat deleted successfully';
+        return 'Conversación eliminada exitosamente';
       },
-      error: 'Failed to delete chat',
+      error: 'Error al eliminar la conversación',
     });
 
     setShowDeleteDialog(false);
@@ -160,7 +159,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Login to save and revisit previous chats!
+            ¡Inicia sesión para guardar y revisar conversaciones anteriores!
           </div>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -201,7 +200,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Your conversations will appear here once you start chatting!
+            ¡Tus conversaciones aparecerán aquí una vez que empieces a chatear!
           </div>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -337,14 +336,14 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
 
           {hasReachedEnd ? (
             <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2 mt-8">
-              You have reached the end of your chat history.
+              Has llegado al final de tu historial de conversaciones.
             </div>
           ) : (
             <div className="p-2 text-zinc-500 dark:text-zinc-400 flex flex-row gap-2 items-center mt-8">
               <div className="animate-spin">
                 <LoaderIcon />
               </div>
-              <div>Loading Chats...</div>
+              <div>Cargando conversaciones...</div>
             </div>
           )}
         </SidebarGroupContent>

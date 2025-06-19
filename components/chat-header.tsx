@@ -6,22 +6,19 @@ import { useWindowSize } from 'usehooks-ts';
 
 import { SidebarToggle } from '@/components/sidebar-toggle';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, VercelIcon } from './icons';
+import { PlusIcon } from './icons';
 import { useSidebar } from './ui/sidebar';
 import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import type { Session } from 'next-auth';
 import { Scale } from 'lucide-react';
 
 function PureChatHeader({
   chatId,
-  selectedVisibilityType,
   isReadonly,
   session,
 }: {
   chatId: string;
-  selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
   session: Session;
 }) {
@@ -66,13 +63,6 @@ function PureChatHeader({
         </Tooltip>
       )}
 
-      {!isReadonly && (
-        <VisibilitySelector
-          chatId={chatId}
-          selectedVisibilityType={selectedVisibilityType}
-          className="order-1 md:order-2"
-        />
-      )}
 
       <Button
         className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white hidden md:flex py-2 px-4 h-fit md:h-[38px] order-4 md:ml-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
