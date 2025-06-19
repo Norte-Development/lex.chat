@@ -697,7 +697,7 @@ export default function EnhancedLandingPage() {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <h3 className="font-semibold mb-4">Producto</h3>
               <div className="space-y-2 text-sm">
                 <Link href="/features" className="block text-muted-foreground hover:text-foreground transition-colors">
@@ -710,25 +710,13 @@ export default function EnhancedLandingPage() {
                   Demo
                 </Link>
               </div>
-            </div>
-
+            </div> */}
+{/* 
             <div>
               <h3 className="font-semibold mb-4">Empresa</h3>
               <div className="space-y-2 text-sm">
-                <Link href="/about" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Acerca de
-                </Link>
-                <Link href="/blog" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Blog
-                </Link>
-                <Link href="/careers" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Carreras
-                </Link>
-                <Link href="/contact" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Contacto
-                </Link>
               </div>
-            </div>
+            </div> */}
 
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
@@ -742,12 +730,12 @@ export default function EnhancedLandingPage() {
                 <Link href="/security" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Seguridad
                 </Link>
-                <Link
+                {/* <Link
                   href="/compliance"
                   className="block text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Cumplimiento
-                </Link>
+                </Link> */}
               </div>
             </div>
           </div>
