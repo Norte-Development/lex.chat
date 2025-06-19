@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import Link from 'next/link';
 import { redirect, useSearchParams } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
@@ -9,7 +9,7 @@ import { SubmitButton } from '@/components/submit-button';
 import { login, type LoginActionState } from '../actions';
 
 function LoginForm() {
-  const [state, formAction] = useFormState<LoginActionState, FormData>(login, {
+  const [state, formAction] = useActionState<LoginActionState, FormData>(login, {
     status: 'idle',
   });
   

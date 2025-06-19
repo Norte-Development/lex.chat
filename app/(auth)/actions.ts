@@ -98,8 +98,11 @@ export const register = async (
       baseUrl,
     });
 
+    console.log('newUser', newUser);
+
     return { status: 'email_sent' };
   } catch (error) {
+    console.error(error);
     if (error instanceof z.ZodError) {
       return { status: 'invalid_data' };
     }

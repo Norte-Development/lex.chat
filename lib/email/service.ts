@@ -1,13 +1,7 @@
-import { createTransport } from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 
-export interface EmailConfig {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
 export interface EmailVerificationData {
@@ -22,31 +16,12 @@ export interface PasswordResetData {
   baseUrl: string;
 }
 
-// Default email configuration - can be overridden by environment variables
-const getEmailConfig = (): EmailConfig => ({
-  host: process.env.SMTP_HOST || 'localhost',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASSWORD || '',
-  },
-});
-
-// Create reusable transporter object using the default SMTP transport
-const createTransporter = () => {
-  const config = getEmailConfig();
-  return createTransport(config);
-};
-
 export const sendEmailVerification = async ({ to, token, baseUrl }: EmailVerificationData): Promise<void> => {
-  const transporter = createTransporter();
-  
   const verificationUrl = `${baseUrl}/verify-email?token=${token}`;
   
-  const mailOptions = {
-    from: process.env.SMTP_FROM || 'noreply@lex-ai.chat',
+  const msg = {
     to,
+    from: process.env.EMAIL_FROM || 'noreply@lex-ai.chat',
     subject: 'Verifica tu cuenta en Lex AI Chat',
     html: `
       <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -114,17 +89,15 @@ Si no solicitaste esta cuenta, puedes ignorar este correo de forma segura.
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  await sgMail.send(msg);
 };
 
 export const sendPasswordReset = async ({ to, token, baseUrl }: PasswordResetData): Promise<void> => {
-  const transporter = createTransporter();
-  
   const resetUrl = `${baseUrl}/reset-password?token=${token}`;
   
-  const mailOptions = {
-    from: process.env.SMTP_FROM || 'noreply@lex-ai.chat',
+  const msg = {
     to,
+    from: process.env.EMAIL_FROM || 'noreply@lex-ai.chat',
     subject: 'Restablece tu contraseña - Lex AI Chat',
     html: `
       <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -199,17 +172,5 @@ Si no solicitaste este restablecimiento, tu cuenta permanece segura y puedes ign
     `
   };
 
-  await transporter.sendMail(mailOptions);
-};
-
-// Test email configuration
-export const testEmailConnection = async (): Promise<boolean> => {
-  try {
-    const transporter = createTransporter();
-    await transporter.verify();
-    return true;
-  } catch (error) {
-    console.error('Email connection test failed:', error);
-    return false;
-  }
-};
+  await sgMail.send(msg);
+}; 

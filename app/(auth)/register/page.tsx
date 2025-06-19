@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import Link from 'next/link';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
@@ -8,7 +8,7 @@ import { register, type RegisterActionState } from '../actions';
 import { CheckCircle, Mail } from 'lucide-react';
 
 export default function RegisterPage() {
-  const [state, formAction] = useFormState<RegisterActionState, FormData>(
+  const [state, formAction] = useActionState<RegisterActionState, FormData>(
     register,
     {
       status: 'idle',

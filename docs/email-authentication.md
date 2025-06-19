@@ -1,6 +1,6 @@
 # Email Authentication Setup
 
-This document explains how to configure email confirmation and password recovery for your Lex AI Chat application.
+This document explains how to configure email confirmation and password recovery for your Lex AI Chat application using SendGrid.
 
 ## Overview
 
@@ -8,7 +8,7 @@ The application now includes:
 - ✅ Email verification for new user registrations
 - ✅ Password reset functionality via email
 - ✅ Professional email templates with legal branding
-- ✅ Configurable SMTP settings
+- ✅ SendGrid API for reliable email delivery
 - ✅ Token-based security with expiration
 
 ## Environment Variables
@@ -19,53 +19,26 @@ Add the following environment variables to your `.env.local` file:
 # Database (required for migrations)
 POSTGRES_URL="your_postgres_connection_string"
 
-# SMTP Configuration (required for email functionality)
-SMTP_HOST="smtp.gmail.com"              # Your SMTP server
-SMTP_PORT="587"                         # SMTP port (usually 587 for TLS)
-SMTP_SECURE="false"                     # Set to "true" for port 465, "false" for 587
-SMTP_USER="your-email@gmail.com"        # Your email address
-SMTP_PASSWORD="your-app-password"       # Your email password or app password
-SMTP_FROM="noreply@lex-ai.chat"         # From address for outgoing emails
+# SendGrid Configuration (required for email functionality)
+SENDGRID_API_KEY="your_sendgrid_api_key"
+EMAIL_FROM="noreply@yourverifieddomain.com" # A verified sender in SendGrid
 
 # Application URL (required for email links)
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"  # Your app's base URL
 ```
 
-## SMTP Provider Setup
+## SendGrid Setup
 
-### Gmail Setup
-1. Enable 2-factor authentication on your Google account
-2. Generate an App Password:
-   - Go to Google Account settings
-   - Security → 2-Step Verification → App passwords
-   - Generate a password for "Mail"
-   - Use this password in `SMTP_PASSWORD`
-
-```bash
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT="587"
-SMTP_SECURE="false"
-SMTP_USER="your-email@gmail.com"
-SMTP_PASSWORD="your-16-character-app-password"
-```
-
-### Outlook/Hotmail Setup
-```bash
-SMTP_HOST="smtp-mail.outlook.com"
-SMTP_PORT="587"
-SMTP_SECURE="false"
-SMTP_USER="your-email@outlook.com"
-SMTP_PASSWORD="your-password"
-```
-
-### Custom SMTP Server
-```bash
-SMTP_HOST="mail.yourdomain.com"
-SMTP_PORT="587"
-SMTP_SECURE="false"
-SMTP_USER="noreply@yourdomain.com"
-SMTP_PASSWORD="your-password"
-```
+1.  **Create a SendGrid Account**: If you don't have one, sign up at [sendgrid.com](https://sendgrid.com).
+2.  **Create an API Key**:
+    -   In your SendGrid dashboard, go to **Settings > API Keys**.
+    -   Click **Create API Key**.
+    -   Give it "Full Access" or restrict it to just "Mail Send".
+    -   Copy the generated API key and store it securely. This is your `SENDGRID_API_KEY`.
+3.  **Verify a Sender Identity**:
+    -   Go to **Settings > Sender Authentication**.
+    -   You must verify either a **Single Sender** or an entire **Domain**. Verifying a domain is recommended for production as it improves deliverability.
+    -   Follow the instructions to verify your `EMAIL_FROM` address.
 
 ## Database Migration
 
@@ -86,14 +59,14 @@ This creates two new tables:
 ## New User Flow
 
 1. **Registration**: User registers with email and password
-2. **Email Sent**: Verification email sent automatically
+2. **Email Sent**: Verification email sent automatically via SendGrid
 3. **Verification**: User clicks link in email to verify account
 4. **Login**: User can now log in with verified email
 
 ## Password Recovery Flow
 
 1. **Forgot Password**: User requests password reset from login page
-2. **Email Sent**: Reset link sent to user's email
+2. **Email Sent**: Reset link sent to user's email via SendGrid
 3. **Reset**: User clicks link and sets new password
 4. **Login**: User can log in with new password
 
@@ -123,37 +96,21 @@ Professional email templates are included with:
 - **Email Verification Required**: Users must verify email before login
 - **Secure Password Hashing**: bcrypt for password storage
 
-## Testing Email Configuration
-
-You can test your SMTP configuration with:
-
-```typescript
-import { testEmailConnection } from '@/lib/email/service';
-
-const isWorking = await testEmailConnection();
-console.log('SMTP working:', isWorking);
-```
-
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"SMTP connection failed"**
-   - Check SMTP credentials
-   - Verify host and port
-   - Check firewall settings
+1. **Emails not sending**
+   - Check that your `SENDGRID_API_KEY` is correct.
+   - Ensure `EMAIL_FROM` is a verified sender in your SendGrid account.
+   - Check the SendGrid Activity Feed for any errors.
 
-2. **"Email not sent"**
-   - Verify `SMTP_FROM` is a valid email
-   - Check your email provider's sending limits
-   - Review spam/security policies
-
-3. **"Invalid token" errors**
+2. **"Invalid token" errors**
    - Tokens expire (24h for verification, 1h for reset)
    - Tokens are single-use only
    - Check database connection
 
-4. **"User not found" errors**
+3. **"User not found" errors**
    - User must exist in database
    - Check email spelling
    - Verify user wasn't deleted
@@ -161,9 +118,9 @@ console.log('SMTP working:', isWorking);
 ### Production Considerations
 
 1. **Email Deliverability**
-   - Use a professional email service (SendGrid, Mailgun, etc.)
-   - Set up SPF, DKIM, and DMARC records
-   - Monitor bounce rates and spam reports
+   - Use a dedicated email service like SendGrid (which you are now doing).
+   - Set up SPF, DKIM, and DMARC records for your domain in SendGrid for best results.
+   - Monitor bounce rates and spam reports in the SendGrid dashboard.
 
 2. **Rate Limiting**
    - Implement rate limiting for password reset requests
@@ -179,7 +136,7 @@ console.log('SMTP working:', isWorking);
 ```
 lib/
 ├── email/
-│   └── service.ts          # Email service with SMTP configuration
+│   └── service.ts          # Email service with SendGrid configuration
 ├── db/
 │   ├── schema.ts           # Updated with new tables
 │   ├── queries.ts          # New email/password functions
@@ -200,8 +157,8 @@ app/(auth)/
 
 ## Next Steps
 
-1. Set up your SMTP provider
-2. Configure environment variables
+1. Set up your SendGrid account and verify a sender
+2. Configure environment variables (`SENDGRID_API_KEY`, `EMAIL_FROM`)
 3. Run database migrations
 4. Test the email functionality
 5. Customize email templates if needed
