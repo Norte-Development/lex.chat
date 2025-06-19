@@ -27,6 +27,10 @@ import {
   type DBMessage,
   type Chat,
   stream,
+  emailVerificationToken,
+  passwordResetToken,
+  type EmailVerificationToken,
+  type PasswordResetToken,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 import { generateUUID } from '../utils';
@@ -57,7 +61,14 @@ export async function createUser(email: string, password: string) {
   const hashedPassword = generateHashedPassword(password);
 
   try {
-    return await db.insert(user).values({ email, password: hashedPassword });
+    return await db.insert(user).values({ 
+      email, 
+      password: hashedPassword,
+      emailVerified: false 
+    }).returning({
+      id: user.id,
+      email: user.email,
+    });
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to create user');
   }
@@ -533,6 +544,142 @@ export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get stream ids by chat id',
+    );
+  }
+}
+
+export async function createEmailVerificationToken(userId: string): Promise<EmailVerificationToken> {
+  try {
+    const token = generateUUID();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Delete any existing verification tokens for this user
+    await db.delete(emailVerificationToken).where(eq(emailVerificationToken.userId, userId));
+
+    const [verificationToken] = await db
+      .insert(emailVerificationToken)
+      .values({
+        userId,
+        token,
+        expiresAt,
+      })
+      .returning();
+
+    return verificationToken;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to create email verification token',
+    );
+  }
+}
+
+export async function verifyEmailToken(token: string): Promise<User | null> {
+  try {
+    const [tokenRecord] = await db
+      .select()
+      .from(emailVerificationToken)
+      .where(eq(emailVerificationToken.token, token));
+
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+      return null;
+    }
+
+    // Update user as verified
+    await db
+      .update(user)
+      .set({ emailVerified: true })
+      .where(eq(user.id, tokenRecord.userId));
+
+    // Delete the used token
+    await db.delete(emailVerificationToken).where(eq(emailVerificationToken.id, tokenRecord.id));
+
+    // Return the updated user
+    const [updatedUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, tokenRecord.userId));
+
+    return updatedUser;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to verify email token',
+    );
+  }
+}
+
+export async function createPasswordResetToken(userId: string): Promise<PasswordResetToken> {
+  try {
+    const token = generateUUID();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    // Delete any existing reset tokens for this user
+    await db.delete(passwordResetToken).where(eq(passwordResetToken.userId, userId));
+
+    const [resetToken] = await db
+      .insert(passwordResetToken)
+      .values({
+        userId,
+        token,
+        expiresAt,
+      })
+      .returning();
+
+    return resetToken;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to create password reset token',
+    );
+  }
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<User | null> {
+  try {
+    const [tokenRecord] = await db
+      .select()
+      .from(passwordResetToken)
+      .where(eq(passwordResetToken.token, token));
+
+    if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+      return null;
+    }
+
+    const hashedPassword = generateHashedPassword(newPassword);
+
+    // Update user password
+    await db
+      .update(user)
+      .set({ password: hashedPassword })
+      .where(eq(user.id, tokenRecord.userId));
+
+    // Delete the used token
+    await db.delete(passwordResetToken).where(eq(passwordResetToken.id, tokenRecord.id));
+
+    // Return the updated user
+    const [updatedUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.id, tokenRecord.userId));
+
+    return updatedUser;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to reset password',
+    );
+  }
+}
+
+export async function getUserByEmail(email: string): Promise<User | null> {
+  try {
+    const [userRecord] = await db.select().from(user).where(eq(user.email, email));
+    return userRecord || null;
+  } catch (error) {
+    throw new ChatSDKError(
+      'bad_request:database',
+      'Failed to get user by email',
     );
   }
 }

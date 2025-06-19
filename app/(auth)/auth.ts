@@ -55,6 +55,10 @@ export const {
           return null;
         }
 
+        if (!user.emailVerified) {
+          return null;
+        }
+
         const passwordsMatch = await compare(password, user.password);
 
         if (!passwordsMatch) return null;

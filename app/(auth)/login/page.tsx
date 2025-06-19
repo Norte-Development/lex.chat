@@ -1,77 +1,101 @@
 'use client';
 
+import { useActionState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import { toast } from '@/components/toast';
-
+import { redirect, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
-
 import { login, type LoginActionState } from '../actions';
-import { useSession } from 'next-auth/react';
 
-export default function Page() {
-  const router = useRouter();
-
-  const [email, setEmail] = useState('');
-  const [isSuccessful, setIsSuccessful] = useState(false);
-
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
-
-  const { update: updateSession } = useSession();
+function LoginForm() {
+  const [state, formAction] = useActionState<LoginActionState, FormData>(login, {
+    status: 'idle',
+  });
+  
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (state.status === 'failed') {
-      toast({
-        type: 'error',
-        description: '¡Credenciales inválidas!',
-      });
-    } else if (state.status === 'invalid_data') {
-      toast({
-        type: 'error',
-        description: '¡Error al validar tu envío!',
-      });
-    } else if (state.status === 'success') {
-      setIsSuccessful(true);
-      updateSession();
-      router.refresh();
+    // Show success messages for email verification or password reset
+    const verified = searchParams.get('verified');
+    const reset = searchParams.get('reset');
+    
+    if (verified === 'true') {
+      // Could show a toast notification here
     }
-  }, [state.status, updateSession, router]);
+    
+    if (reset === 'true') {
+      // Could show a toast notification here
+    }
+  }, [searchParams]);
 
-  const handleSubmit = (formData: FormData) => {
-    setEmail(formData.get('email') as string);
-    formAction(formData);
-  };
+  if (state.status === 'success') {
+    redirect('/');
+  }
 
   return (
-    <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
+    <div className="flex h-dvh w-screen items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
           <h3 className="text-xl font-semibold dark:text-zinc-50">Iniciar Sesión</h3>
           <p className="text-sm text-gray-500 dark:text-zinc-400">
-            Usa tu email y contraseña para iniciar sesión
+            Accede a tu cuenta de Lex AI Chat
           </p>
         </div>
-        <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Iniciar sesión</SubmitButton>
-          <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
-            {"¿No tienes una cuenta? "}
+        <AuthForm action={formAction}>
+          {state.status === 'failed' && (
+            <div className="text-sm text-red-500">
+              Email o contraseña incorrectos. Por favor, inténtalo de nuevo.
+            </div>
+          )}
+          {state.status === 'invalid_data' && (
+            <div className="text-sm text-red-500">
+              Datos de entrada inválidos. Por favor, verifica tu información.
+            </div>
+          )}
+          {state.status === 'email_not_verified' && (
+            <div className="text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md">
+              <p className="font-medium mb-1">Email no verificado</p>
+              <p className="text-xs">
+                Debes verificar tu dirección de email antes de poder iniciar sesión. 
+                Revisa tu bandeja de entrada y haz clic en el enlace de verificación.
+              </p>
+              <p className="text-xs mt-2">
+                ¿No recibiste el email? Puedes solicitar uno nuevo en la página de registro.
+              </p>
+            </div>
+          )}
+          
+          <SubmitButton isSuccessful={false}>Iniciar Sesión</SubmitButton>
+          
+          <div className="text-center">
             <Link
-              href="/register"
-              className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
             >
-              Regístrate
+              ¿Olvidaste tu contraseña?
             </Link>
-            {' gratis.'}
-          </p>
+          </div>
         </AuthForm>
+        
+        <div className="text-center text-sm text-gray-500 dark:text-zinc-400">
+          ¿No tienes una cuenta?{' '}
+          <Link
+            href="/register"
+            className="font-semibold text-gray-800 hover:underline dark:text-zinc-200"
+          >
+            Regístrate
+          </Link>
+        </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex h-dvh w-screen items-center justify-center bg-background">Cargando...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
