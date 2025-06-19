@@ -194,3 +194,40 @@ export const stream = pgTable(
 );
 
 export type Stream = InferSelectModel<typeof stream>;
+
+export const subscription = pgTable('Subscription', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  stripeCustomerId: varchar('stripeCustomerId', { length: 255 }).notNull(),
+  stripeSubscriptionId: varchar('stripeSubscriptionId', { length: 255 }).notNull().unique(),
+  stripePriceId: varchar('stripePriceId', { length: 255 }).notNull(),
+  status: varchar('status', { 
+    enum: ['active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid']
+  }).notNull(),
+  currentPeriodStart: timestamp('currentPeriodStart').notNull(),
+  currentPeriodEnd: timestamp('currentPeriodEnd').notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+});
+
+export type Subscription = InferSelectModel<typeof subscription>;
+
+export const payment = pgTable('Payment', {
+  id: uuid('id').primaryKey().notNull().defaultRandom(),
+  userId: uuid('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  subscriptionId: uuid('subscriptionId')
+    .references(() => subscription.id, { onDelete: 'cascade' }),
+  stripePaymentIntentId: varchar('stripePaymentIntentId', { length: 255 }).notNull().unique(),
+  amount: varchar('amount', { length: 10 }).notNull(), // Store as string to avoid precision issues
+  currency: varchar('currency', { length: 3 }).notNull().default('usd'),
+  status: varchar('status', { 
+    enum: ['succeeded', 'pending', 'failed', 'canceled']
+  }).notNull(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+});
+
+export type Payment = InferSelectModel<typeof payment>;
