@@ -69,7 +69,7 @@ export default function TermsPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-3">Introducción</h2>
                   <p className="text-muted-foreground leading-relaxed">
-                    Estos Términos de Servicio ("Términos") rigen el uso de la plataforma lex-ai.chat 
+                    Estos Términos de Servicio (&quot;Términos&quot;) rigen el uso de la plataforma lex-ai.chat 
                     y todos los servicios relacionados proporcionados por nuestra empresa. Al acceder 
                     o utilizar nuestros servicios, usted acepta estar sujeto a estos Términos.
                   </p>

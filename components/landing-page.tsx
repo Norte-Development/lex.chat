@@ -709,9 +709,6 @@ export default function EnhancedLandingPage() {
                 <Link href="/demo" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Demo
                 </Link>
-                <Link href="/api" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  API
-                </Link>
               </div>
             </div>
 
