@@ -21,14 +21,14 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from './toast';
 import { LoaderIcon } from './icons';
-import { guestRegex } from '@/lib/constants';
 
 export function SidebarUserNav({ user }: { user: User }) {
   const router = useRouter();
-  const { data, status } = useSession();
+  const { status } = useSession();
   const { setTheme, resolvedTheme } = useTheme();
 
-  const isGuest = guestRegex.test(data?.user?.email ?? '');
+  // Since guests are blocked at middleware level, all users here are authenticated
+  const isGuest = false;
 
   return (
     <SidebarMenu>
@@ -60,7 +60,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                   className="rounded-full"
                 />
                 <span data-testid="user-email" className="truncate">
-                  {isGuest ? 'Invitado' : user?.email}
+                  {user?.email}
                 </span>
                 <ChevronUp className="ml-auto" />
               </SidebarMenuButton>
@@ -94,16 +94,12 @@ export function SidebarUserNav({ user }: { user: User }) {
                     return;
                   }
 
-                  if (isGuest) {
-                    router.push('/login');
-                  } else {
-                    signOut({
-                      redirectTo: '/',
-                    });
-                  }
+                  signOut({
+                    redirectTo: '/',
+                  });
                 }}
               >
-                {isGuest ? 'Iniciar sesión en tu cuenta' : 'Cerrar sesión'}
+                Cerrar sesión
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>

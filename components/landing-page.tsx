@@ -40,12 +40,6 @@ export default function EnhancedLandingPage() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/demo" className="hidden md:block text-sm font-medium hover:text-primary transition-colors">
-              Ver Demo
-            </Link>
-            <Link href="/pricing" className="hidden md:block text-sm font-medium hover:text-primary transition-colors">
-              Precios
-            </Link>
             <Link href="/login">
               <Button variant="outline" className="hover:bg-primary/5 border-primary/20 transition-all duration-300">
                 Iniciar Sesión
