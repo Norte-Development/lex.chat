@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import { createTransport } from 'nodemailer';
 
 export interface EmailConfig {
   host: string;
@@ -36,7 +36,7 @@ const getEmailConfig = (): EmailConfig => ({
 // Create reusable transporter object using the default SMTP transport
 const createTransporter = () => {
   const config = getEmailConfig();
-  return nodemailer.createTransport(config);
+  return createTransport(config);
 };
 
 export const sendEmailVerification = async ({ to, token, baseUrl }: EmailVerificationData): Promise<void> => {

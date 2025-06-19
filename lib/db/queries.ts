@@ -65,6 +65,9 @@ export async function createUser(email: string, password: string) {
       email, 
       password: hashedPassword,
       emailVerified: false 
+    }).returning({
+      id: user.id,
+      email: user.email,
     });
   } catch (error) {
     throw new ChatSDKError('bad_request:database', 'Failed to create user');

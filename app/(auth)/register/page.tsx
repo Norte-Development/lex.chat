@@ -44,7 +44,7 @@ export default function RegisterPage() {
               <ol className="text-sm text-blue-700 dark:text-blue-400 text-left space-y-1">
                 <li>1. Revisa tu bandeja de entrada</li>
                 <li>2. Busca el email de Lex AI Chat</li>
-                <li>3. Haz clic en "Verificar mi cuenta"</li>
+                                 <li>3. Haz clic en &quot;Verificar mi cuenta&quot;</li>
                 <li>4. Regresa aquí para iniciar sesión</li>
               </ol>
             </div>

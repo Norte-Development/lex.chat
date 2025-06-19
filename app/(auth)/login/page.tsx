@@ -2,15 +2,13 @@
 
 import { useFormState } from 'react-dom';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
 import { login, type LoginActionState } from '../actions';
-import { auth } from '../auth';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction] = useFormState<LoginActionState, FormData>(login, {
     status: 'idle',
   });
@@ -91,5 +89,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex h-dvh w-screen items-center justify-center bg-background">Cargando...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
