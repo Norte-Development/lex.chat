@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from "next/link"
@@ -34,22 +34,32 @@ import {
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// Component that handles search params
+function SearchParamsHandler({ 
+  onShowCancelMessage 
+}: { 
+  onShowCancelMessage: (show: boolean) => void 
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const canceled = searchParams.get('canceled');
+    if (canceled === 'true') {
+      onShowCancelMessage(true);
+      // Clear the message after 5 seconds
+      setTimeout(() => onShowCancelMessage(false), 5000);
+    }
+  }, [searchParams, onShowCancelMessage]);
+
+  return null;
+}
+
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCancelMessage, setShowCancelMessage] = useState(false);
   const [hasActiveSubscription, setHasActiveSubscription] = useState<boolean | null>(null);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
-  const searchParams = useSearchParams();
   const { data: session } = useSession();
-
-  useEffect(() => {
-    const canceled = searchParams.get('canceled');
-    if (canceled === 'true') {
-      setShowCancelMessage(true);
-      // Clear the message after 5 seconds
-      setTimeout(() => setShowCancelMessage(false), 5000);
-    }
-  }, [searchParams]);
 
   // Check subscription status
   useEffect(() => {
@@ -145,6 +155,11 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Search Params Handler */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler onShowCancelMessage={setShowCancelMessage} />
+      </Suspense>
+      
       {/* Cancel Message */}
       {showCancelMessage && (
         <div className="bg-orange-100 dark:bg-orange-900/20 border-l-4 border-orange-500 p-4 text-orange-700 dark:text-orange-300">
