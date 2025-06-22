@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { stripe } from '@/lib/stripe-config';
-import { STRIPE_WEBHOOK_SECRET } from '@/lib/stripe-constants';
+import { STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID } from '@/lib/stripe-constants';
 import {
   createSubscription,
   updateSubscription,
@@ -104,6 +104,13 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
   const userId = subscription.metadata.userId;
   if (!userId) {
     console.error('No userId in subscription metadata');
+    return;
+  }
+
+  // Validate price_id
+  const priceId = subscription.items.data[0]?.price?.id;
+  if (!priceId || priceId !== STRIPE_PRICE_ID) {
+    console.warn(`⚠️ Invalid or unknown price_id: ${priceId}. Expected: ${STRIPE_PRICE_ID}. Skipping subscription processing.`);
     return;
   }
 

@@ -39,6 +39,7 @@ Two new tables were added to support subscriptions:
 - Processes Stripe webhook events
 - Handles subscription creation, updates, and cancellation
 - Processes payment success/failure events
+- Validates price_id to ensure only valid subscriptions are processed
 
 #### `/api/subscription/status`
 - Checks if current user has active subscription
@@ -133,6 +134,8 @@ Use Stripe's test mode and test card numbers:
 - Webhook signatures are verified for authenticity
 - User sessions are verified before subscription operations
 - Database queries use prepared statements via Drizzle ORM
+- Price ID validation ensures only legitimate subscriptions are processed
+- Invalid price IDs are logged but don't cause webhook failures (returns 200)
 
 ## Subscription Status Logic
 
